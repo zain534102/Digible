@@ -1,46 +1,48 @@
 <div class="white px-4 section-header pt-5">
-    <h3>Users list</h3>
-    <p class="grey-text">Manage your customers list</p>
+  <h3>Posts list</h3>
+  <p class="grey-text">Manage your customers list</p>
+</div>
+
+<div class="container-fluid pt-5">
+  <div>
+    <button mdbBtn color="primary" (click)="onAddUser()">Add new Post</button>
+    <div class="mt-4 white">
+      <div class="z-depth-1">
+        <table class="table table-striped table-responsive-md btn-table" mdbTable #tableEl="mdbTable">
+          <thead style="background-color: transparent">
+            <tr>
+              <th>Id</th>
+              <th>Title</th>
+              <th>Description</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let post of posts;let i = index">
+              <th *ngIf="i+1 >= mdbTablePagination.firstItemIndex && i < mdbTablePagination.lastItemIndex"
+                scope="row">{{post.id}}</th>
+              <td *ngIf="i+1 >= mdbTablePagination.firstItemIndex && i < mdbTablePagination.lastItemIndex">{{post.title}}</td>
+              <td *ngIf="i+1 >= mdbTablePagination.firstItemIndex && i < mdbTablePagination.lastItemIndex">{{post.body}}</td>
+              <td *ngIf="i+1 >= mdbTablePagination.firstItemIndex && i < mdbTablePagination.lastItemIndex">
+                <a class="mr-2">
+                  <mdb-icon fas icon="edit" (click)="onEditUser()"></mdb-icon>
+                </a>
+                <a>
+                  <mdb-icon fas icon="trash" (click)="onDeletePost()"></mdb-icon>
+                </a>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot class="grey lighten-5 w-100">
+            <tr>
+              <td colspan="4">
+                <mdb-table-pagination [tableEl]="tableEl" [searchDataSource]="posts"></mdb-table-pagination>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
   </div>
-  
-  <div class="container-fluid pt-5 pb-5">
-    <div>
-      <button mdbBtn color="primary" (click)="onAddUser()">Add new customer</button>
-      <div class="mt-4 white">
-        <div class="z-depth-1">
-            <table class="table table-striped table-responsive-md btn-table" mdbTable>
-                <thead style="background-color: transparent">
-                    <tr>
-                        <th>Id</th>
-                        <th>Name</th>
-                        <th>Description</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-    
-                <tbody>
-                    <tr>
-                        <th scope="row"></th>
-                        <td></td>
-                        <td></td>
-                        <td>
-                            <a class="mr-2">
-                                <mdb-icon fas icon="edit" (click)="onEditUser()"></mdb-icon>
-                            </a>
-                            <a>
-                                <mdb-icon fas icon="trash" (click)="onDeletePost()"></mdb-icon>
-                            </a>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-  
-      <!-- <div *ngIf="isLoading$ | async" class="d-flex justify-content-center align-items-center" style="margin-top: 200px">
-        <div class="spinner-grow text-primary" role="status" style="width: 4rem; height: 4rem;">
-          <span class="sr-only">Loading...</span>
-        </div>
-      </div> -->
-    </div>
-  </div>  
+</div>
