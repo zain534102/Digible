@@ -12,7 +12,7 @@ export class PostService{
     private getUrl = environment.REST_HOST + 'posts';
     private createUrl = environment.REST_HOST + 'posts';
     private updateUrl = environment.REST_HOST + 'posts/';
-    private deleteUrl = environment.REST_HOST + '/posts/';
+    private deleteUrl = environment.REST_HOST + 'posts/';
     private headers = new HttpHeaders()
             .set('Content-type', 'application/json; charset=UTF-8');
     constructor(
@@ -28,6 +28,7 @@ export class PostService{
             return this.http.put(this.updateUrl + id, {headers: this.headers} , request);
         }
         public deletePost( id: number ): Observable<any>{
-            return this.http.delete(this.deleteUrl + identifierModuleUrl + id);
+            console.log(id);
+            return this.http.delete(this.deleteUrl + id);
         }
 }

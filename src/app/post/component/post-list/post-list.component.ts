@@ -5,6 +5,7 @@ import { PostEditModalComponent } from './../post-edit-modal/post-edit-modal.com
 import { Component, OnInit , ViewChild, HostListener, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { MDBModalRef, MDBModalService , MdbTablePaginationComponent, MdbTableDirective } from 'angular-bootstrap-md';
 import {PostCreateComponent} from '../post-create/post-create.component';
+import { take} from 'rxjs/operators';
 @Component({
   selector: 'app-post-list',
   templateUrl: './post-list.component.html',
@@ -14,7 +15,7 @@ export class PostListComponent implements OnInit {
   modalRef!: MDBModalRef;
   @ViewChild(MdbTablePaginationComponent, { static: true }) mdbTablePagination!: MdbTablePaginationComponent;
   @ViewChild(MdbTableDirective, { static: true }) mdbTable!: MdbTableDirective;
-  posts!: any;
+  posts: any = [];
   previous: any = [];
   modalConfig: { class: string; } = {
     class: 'modal-dialog-centered'
@@ -26,26 +27,65 @@ export class PostListComponent implements OnInit {
     ) { }
 
   ngOnInit(): void {
-      this.postService.getAllPosts().subscribe(posts => {
-          this.posts = posts;
-          this.intiatePagination(posts);
-      });
+     this.getAllPosts();
   }
-  onAddUser(): void {
+  /**
+   * Gets all posts
+   */
+  getAllPosts(): void{
+    this.postService.getAllPosts().subscribe(posts => {
+      this.posts = posts;
+      this.intiatePagination(posts);
+  });
+  }
+  onAddPost(): void {
     this.modalRef = this.modalService.show(PostCreateComponent, this.modalConfig);
-
     this.modalRef.content.heading = 'Add new Post';
+    this.modalRef.content.postData.pipe(take(1)).subscribe((postData: Post) => {
+        this.postService.createPost(postData).subscribe(post => {
+         this.createPost(postData);
+        });
+    });
+
   }
-  onEditUser(): void{
+  onEditPost(post: Post): void{
     this.modalRef = this.modalService.show(PostEditModalComponent, this.modalConfig);
     this.modalRef.content.heading = 'Edit Post';
+    const postCopy = {
+      title: post.title || null,
+      body: post.body || null,
+      userId: post.userId || null,
+     };
+    this.modalRef.content.post = postCopy;
+    this.modalRef.content.postEditData.pipe(take(1)).subscribe((postData: Post) => {
+      this.postService.createPost(postData).subscribe(editpost => {
+       this.editPost(postData, post);
+      });
+  });
+    
   }
-  onDeletePost(): void{
+  /**
+   * Delete Post
+   * @param post
+   */
+  onDeletePost(post: Post): void{
     this.modalRef = this.modalService.show(ConfirmModalComponent, this.modalConfig);
     this.modalRef.content.heading = 'Delete Post';
+    this.modalRef.content.confirmation.pipe(take(1)).subscribe( (confirmation: boolean) => {
+      if (confirmation){
+            this.postService.deletePost(post.id!).subscribe(deleted => {
+              this.filterPost(post);
+              this.intiatePagination(this.posts);
+            });
+      }
+    });
   }
+  /**
+   * Intiates frontend paginations
+   * @param posts
+   */
   intiatePagination(posts: any): void{
-    this.mdbTable.setDataSource(this.posts);
+    this.mdbTable.setDataSource(posts);
     this.mdbTablePagination.setMaxVisibleItemsNumberTo(5);
 
     this.mdbTablePagination.calculateFirstItemIndex();
@@ -54,6 +94,31 @@ export class PostListComponent implements OnInit {
     this.posts = this.mdbTable.getDataSource();
     this.previous = this.mdbTable.getDataSource();
   }
-
-
+  /**
+   * Function used to elminate deleted id as api does not deletes
+   * @param post
+   */
+  filterPost(post: Post): void{
+      this.posts = this.posts.filter( (originalPost: any) => {
+        if (originalPost.id !== post.id){
+          return originalPost;
+        }
+      });
+  }
+  createPost(postData: Post): void{
+    postData.id = this.posts[this.posts.length - 1].id + 1;
+    this.posts.push(postData);
+    this.intiatePagination(this.posts);
+  }
+  editPost(postData: Post, oldPost: Post):void{
+ this.posts =  this.posts.map((post: Post) => {
+    if (post.id == oldPost.id){
+      post.title = postData.title;
+      post.body = postData.body;
+      post.userId = postData.userId;
+    }
+    return post;
+    });
+  this.intiatePagination(this.posts);
+  }
 }

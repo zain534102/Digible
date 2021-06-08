@@ -5,7 +5,7 @@
 
 <div class="container-fluid pt-5">
   <div>
-    <button mdbBtn color="primary" (click)="onAddUser()">Add new Post</button>
+    <button mdbBtn color="primary" (click)="onAddPost()">Add new Post</button>
     <div class="mt-4 white">
       <div class="z-depth-1">
         <table class="table table-striped table-responsive-md btn-table" mdbTable #tableEl="mdbTable">
@@ -26,10 +26,10 @@
               <td *ngIf="i+1 >= mdbTablePagination.firstItemIndex && i < mdbTablePagination.lastItemIndex">{{post.body}}</td>
               <td *ngIf="i+1 >= mdbTablePagination.firstItemIndex && i < mdbTablePagination.lastItemIndex">
                 <a class="mr-2">
-                  <mdb-icon fas icon="edit" (click)="onEditUser()"></mdb-icon>
+                  <mdb-icon fas icon="edit" (click)="onEditPost(post)"></mdb-icon>
                 </a>
                 <a>
-                  <mdb-icon fas icon="trash" (click)="onDeletePost()"></mdb-icon>
+                  <mdb-icon fas icon="trash" (click)="onDeletePost(post)"></mdb-icon>
                 </a>
               </td>
             </tr>

@@ -1,30 +1,49 @@
 <div class="modal-content">
-    <div class="modal-header">
-      <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
-        <span aria-hidden="true">×</span>
-      </button>
-      <h4 class="modal-title w-100" id="myModalLabel">{{ heading }}</h4>
-    </div>
-    <div class="modal-body">
-      <form>
-        <!-- Name input -->
-        <div class="form-outline mb-4">
-          <input type="text" id="form5Example1" class="form-control" />
-          <label class="form-label" for="form5Example1">Name</label>
-        </div>
-      
-        <!-- Email input -->
-        <div class="form-outline mb-4">
-          <input type="email" id="form5Example2" class="form-control" />
-          <label class="form-label" for="form5Example2">Email address</label>
-        </div>  
-        <!-- Submit button -->
-      </form>
-    </div>
-    <div class="modal-footer">
-      <button type="button" mdbBtn color="white" class="black-text waves-light" aria-label="Close" (click)="modalRef.hide()"
-        mdbWavesEffect>Close</button>
-      <button type="button" mdbBtn color="red" class="relative waves-light" mdbWavesEffect>Save</button>
-    </div>
+  <div class="modal-header">
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">×</span>
+    </button>
+    <h4 class="modal-title w-100" id="myModalLabel">{{ heading }}</h4>
   </div>
-  
+  <div class="modal-body">
+    <form #postForm="ngForm" (ngSubmit)="onSave()">
+      <!-- Title input -->
+      <div class="form-outline mb-4">
+        <label class="form-label" for="form5Example1">Titlte</label>
+        <input type="text" id="form5Example1" name="title" class="form-control" [(ngModel)]="post.title" mdbInput [mdbValidate]="false" [validateSuccess]="false" #title="ngModel" required/>
+        <mdb-error *ngIf="title && title.invalid && (title.dirty || title.touched)">Title is required</mdb-error>
+      </div>
+    
+      <!-- Description input -->
+      <div class="form-outline mb-4">
+        <label class="form-label" for="form5Example2">Description</label>
+        <textarea type="description" id="form5Example2" class="form-control invalid" name="body" rows="5" [(ngModel)]="post.body" mdbInput [mdbValidate]="false" [validateSuccess]="false" #body="ngModel" required></textarea>
+        <mdb-error *ngIf="body && body.invalid && (body.dirty || body.touched)">Body is required</mdb-error>
+      </div>  
+      <!-- User input -->
+      <div class="form-outline mb-4">
+        <label class="form-label" for="form5Example2">User</label>
+        <select name="userId" class="form-control" [(ngModel)]="post.userId" mdbSelect [mdbValidate]="false" [validateSuccess]="false" #userId="ngModel" required>
+          <option>Select a user</option>
+          <option id="1">Test 1</option>
+          <option id="2">Test 2</option>
+          <option id="3">Test 3</option>
+          <option id="4">Test 4</option>
+          <option id="5">Test 5</option>
+          <option id="6">Test 6</option>
+          <option id="7">Test 7</option>
+          <option id="8">Test 8</option>
+          <option id="9">Test 9</option>
+          <option id="10">Test 10</option>
+        </select>
+        <mdb-error *ngIf="userId && userId.invalid && (userId.dirty || userId.touched)">User Id is required</mdb-error>
+      </div> 
+      <!-- Submit button -->
+      <div class="modal-footer">
+        <button type="button" mdbBtn color="white" class="black-text waves-light" aria-label="Close" (click)="modalRef.hide()"
+          mdbWavesEffect>Close</button>
+        <button type="submit" mdbBtn color="red" class="relative waves-light" mdbWavesEffect>Save</button>
+      </div>
+    </form>
+  </div>
+</div>
