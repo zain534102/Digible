@@ -1,3 +1,4 @@
+import { SubjectService } from './post/services/subject.service';
 import { PostService } from './post/services/post.service';
 import { PostModule } from './post/post.module';
 import { from } from 'rxjs';
@@ -20,6 +21,6 @@ import { NgForm, FormsModule } from '@angular/forms';
     HttpClientModule,
   ],
   providers: [PostService],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent, SubjectService]
 })
 export class AppModule { }

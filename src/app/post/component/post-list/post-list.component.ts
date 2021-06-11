@@ -1,3 +1,4 @@
+import { SubjectService } from './../../services/subject.service';
 import { Post, PostResponse } from './../../models/post';
 import { PostService } from './../../services/post.service';
 import { ConfirmModalComponent } from './../confirm-modal/confirm-modal.component';
@@ -23,12 +24,18 @@ export class PostListComponent implements OnInit {
   constructor(
     private modalService: MDBModalService,
     private postService: PostService,
-    private cdRef: ChangeDetectorRef
+    private cdRef: ChangeDetectorRef,
+    private subjectService: SubjectService
     ) { }
 
   ngOnInit(): void {
-     this.getAllPosts();
+    this.subjectService.keyword.subscribe(keyword => {
+      console.log(keyword);
+        this.searchPost(keyword);
+    });
+    this.getAllPosts();
   }
+
   /**
    * Gets all posts
    */
@@ -38,6 +45,9 @@ export class PostListComponent implements OnInit {
       this.intiatePagination(posts);
   });
   }
+  /**
+   * add Post Button Function
+   */
   onAddPost(): void {
     this.modalRef = this.modalService.show(PostCreateComponent, this.modalConfig);
     this.modalRef.content.heading = 'Add new Post';
@@ -62,11 +72,11 @@ export class PostListComponent implements OnInit {
        this.editPost(postData, post);
       });
   });
-    
   }
   /**
    * Delete Post
-   * @param post
+   * Called due to api bound
+   * @param post: Post
    */
   onDeletePost(post: Post): void{
     this.modalRef = this.modalService.show(ConfirmModalComponent, this.modalConfig);
@@ -82,7 +92,7 @@ export class PostListComponent implements OnInit {
   }
   /**
    * Intiates frontend paginations
-   * @param posts
+   * @param posts: Post
    */
   intiatePagination(posts: any): void{
     this.mdbTable.setDataSource(posts);
@@ -96,7 +106,7 @@ export class PostListComponent implements OnInit {
   }
   /**
    * Function used to elminate deleted id as api does not deletes
-   * @param post
+   * @param post: Post
    */
   filterPost(post: Post): void{
       this.posts = this.posts.filter( (originalPost: any) => {
@@ -105,14 +115,25 @@ export class PostListComponent implements OnInit {
         }
       });
   }
+  /**
+   * create Post
+   * Called due to api bound
+   * @param postData: Post
+   */
   createPost(postData: Post): void{
     postData.id = this.posts[this.posts.length - 1].id + 1;
     this.posts.push(postData);
     this.intiatePagination(this.posts);
   }
-  editPost(postData: Post, oldPost: Post):void{
- this.posts =  this.posts.map((post: Post) => {
-    if (post.id == oldPost.id){
+  /**
+   * edit Post
+   * Called due to api bound
+   * @param postData: Post
+   * @param oldPost: Post
+   */
+  editPost(postData: Post, oldPost: Post): void{
+  this.posts =  this.posts.map((post: Post) => {
+    if (post.id === oldPost.id){
       post.title = postData.title;
       post.body = postData.body;
       post.userId = postData.userId;
@@ -120,5 +141,13 @@ export class PostListComponent implements OnInit {
     return post;
     });
   this.intiatePagination(this.posts);
+  }
+  /**
+   * Search data
+   * @param keyword: string
+   */
+  searchPost(keyword: string): void{
+      this.postService.searchPost(keyword).subscribe( res => {
+      });
   }
 }

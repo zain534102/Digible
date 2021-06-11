@@ -16,9 +16,12 @@
         <!-- Links -->
 
         <!-- Search form -->
-        <form class="form-inline waves-light" mdbWavesEffect>
+        <form class="form-inline waves-light" mdbWavesEffect (submit)="searchData()">
             <div class="md-form my-0">
-                <input class="form-control mr-sm-2" type="text" placeholder="Search">
+                <input class="form-control mr-sm-2" type="text" name="searchKeyword" placeholder="Search" [(ngModel)]="searchKeyword">
+            </div>
+            <div class="md-form form-group">
+                <button href="" class="btn btn-success btn-sm" type="submit">Search</button>
             </div>
         </form>
     </links>
