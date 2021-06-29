@@ -1,12 +1,17 @@
+import { getPostsSuccessSelector } from './../../../store/selectors/getPostSelector.selector';
 import { SubjectService } from './../../services/subject.service';
 import { Post, PostResponse } from './../../models/post';
 import { PostService } from './../../services/post.service';
 import { ConfirmModalComponent } from './../confirm-modal/confirm-modal.component';
 import { PostEditModalComponent } from './../post-edit-modal/post-edit-modal.component';
-import { Component, OnInit , ViewChild, HostListener, AfterViewInit, ChangeDetectorRef } from '@angular/core';
-import { MDBModalRef, MDBModalService , MdbTablePaginationComponent, MdbTableDirective } from 'angular-bootstrap-md';
-import {PostCreateComponent} from '../post-create/post-create.component';
-import { take} from 'rxjs/operators';
+import { Component, OnInit, ViewChild, HostListener, AfterViewInit, ChangeDetectorRef } from '@angular/core';
+import { MDBModalRef, MDBModalService, MdbTablePaginationComponent, MdbTableDirective } from 'angular-bootstrap-md';
+import { PostCreateComponent } from '../post-create/post-create.component';
+import { take } from 'rxjs/operators';
+import { Store } from '@ngrx/store';
+import { State } from 'src/app/store/state/post.state';
+import * as postSelector from '../../../store/selectors';
+import * as formAction from '../../../store/actions/index';
 @Component({
   selector: 'app-post-list',
   templateUrl: './post-list.component.html',
@@ -17,6 +22,7 @@ export class PostListComponent implements OnInit {
   @ViewChild(MdbTablePaginationComponent, { static: true }) mdbTablePagination!: MdbTablePaginationComponent;
   @ViewChild(MdbTableDirective, { static: true }) mdbTable!: MdbTableDirective;
   posts: any = [];
+  public posts$ = this.store$.select(postSelector.getPostsSuccessSelector);
   previous: any = [];
   modalConfig: { class: string; } = {
     class: 'modal-dialog-centered'
@@ -25,13 +31,17 @@ export class PostListComponent implements OnInit {
     private modalService: MDBModalService,
     private postService: PostService,
     private cdRef: ChangeDetectorRef,
-    private subjectService: SubjectService
-    ) { }
+    private subjectService: SubjectService,
+    private store$: Store<State>,
+  ) { }
 
   ngOnInit(): void {
+    this.store$.dispatch(formAction.actionGetPosts());
+    this.posts$.subscribe(data => {
+      console.log(data);
+    });
     this.subjectService.keyword.subscribe(keyword => {
-      console.log(keyword);
-        this.searchPost(keyword);
+      this.searchPost(keyword);
     });
     this.getAllPosts();
   }
@@ -39,11 +49,11 @@ export class PostListComponent implements OnInit {
   /**
    * Gets all posts
    */
-  getAllPosts(): void{
+  getAllPosts(): void {
     this.postService.getAllPosts().subscribe(posts => {
       this.posts = posts;
       this.intiatePagination(posts);
-  });
+    });
   }
   /**
    * add Post Button Function
@@ -52,41 +62,41 @@ export class PostListComponent implements OnInit {
     this.modalRef = this.modalService.show(PostCreateComponent, this.modalConfig);
     this.modalRef.content.heading = 'Add new Post';
     this.modalRef.content.postData.pipe(take(1)).subscribe((postData: Post) => {
-        this.postService.createPost(postData).subscribe(post => {
-         this.createPost(postData);
-        });
+      this.postService.createPost(postData).subscribe(post => {
+        this.createPost(postData);
+      });
     });
 
   }
-  onEditPost(post: Post): void{
+  onEditPost(post: Post): void {
     this.modalRef = this.modalService.show(PostEditModalComponent, this.modalConfig);
     this.modalRef.content.heading = 'Edit Post';
     const postCopy = {
       title: post.title || null,
       body: post.body || null,
       userId: post.userId || null,
-     };
+    };
     this.modalRef.content.post = postCopy;
     this.modalRef.content.postEditData.pipe(take(1)).subscribe((postData: Post) => {
       this.postService.createPost(postData).subscribe(editpost => {
-       this.editPost(postData, post);
+        this.editPost(postData, post);
       });
-  });
+    });
   }
   /**
    * Delete Post
    * Called due to api bound
    * @param post: Post
    */
-  onDeletePost(post: Post): void{
+  onDeletePost(post: Post): void {
     this.modalRef = this.modalService.show(ConfirmModalComponent, this.modalConfig);
     this.modalRef.content.heading = 'Delete Post';
-    this.modalRef.content.confirmation.pipe(take(1)).subscribe( (confirmation: boolean) => {
-      if (confirmation){
-            this.postService.deletePost(post.id!).subscribe(deleted => {
-              this.filterPost(post);
-              this.intiatePagination(this.posts);
-            });
+    this.modalRef.content.confirmation.pipe(take(1)).subscribe((confirmation: boolean) => {
+      if (confirmation) {
+        this.postService.deletePost(post.id!).subscribe(deleted => {
+          this.filterPost(post);
+          this.intiatePagination(this.posts);
+        });
       }
     });
   }
@@ -94,7 +104,7 @@ export class PostListComponent implements OnInit {
    * Intiates frontend paginations
    * @param posts: Post
    */
-  intiatePagination(posts: any): void{
+  intiatePagination(posts: any): void {
     this.mdbTable.setDataSource(posts);
     this.mdbTablePagination.setMaxVisibleItemsNumberTo(5);
 
@@ -108,19 +118,19 @@ export class PostListComponent implements OnInit {
    * Function used to elminate deleted id as api does not deletes
    * @param post: Post
    */
-  filterPost(post: Post): void{
-      this.posts = this.posts.filter( (originalPost: any) => {
-        if (originalPost.id !== post.id){
-          return originalPost;
-        }
-      });
+  filterPost(post: Post): void {
+    this.posts = this.posts.filter((originalPost: any) => {
+      if (originalPost.id !== post.id) {
+        return originalPost;
+      }
+    });
   }
   /**
    * create Post
    * Called due to api bound
    * @param postData: Post
    */
-  createPost(postData: Post): void{
+  createPost(postData: Post): void {
     postData.id = this.posts[this.posts.length - 1].id + 1;
     this.posts.push(postData);
     this.intiatePagination(this.posts);
@@ -131,23 +141,23 @@ export class PostListComponent implements OnInit {
    * @param postData: Post
    * @param oldPost: Post
    */
-  editPost(postData: Post, oldPost: Post): void{
-  this.posts =  this.posts.map((post: Post) => {
-    if (post.id === oldPost.id){
-      post.title = postData.title;
-      post.body = postData.body;
-      post.userId = postData.userId;
-    }
-    return post;
+  editPost(postData: Post, oldPost: Post): void {
+    this.posts = this.posts.map((post: Post) => {
+      if (post.id === oldPost.id) {
+        post.title = postData.title;
+        post.body = postData.body;
+        post.userId = postData.userId;
+      }
+      return post;
     });
-  this.intiatePagination(this.posts);
+    this.intiatePagination(this.posts);
   }
   /**
    * Search data
    * @param keyword: string
    */
-  searchPost(keyword: string): void{
-      this.postService.searchPost(keyword).subscribe( res => {
-      });
+  searchPost(keyword: string): void {
+    this.postService.searchPost(keyword).subscribe(res => {
+    });
   }
 }

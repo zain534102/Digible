@@ -19,8 +19,8 @@ export class PostService {
     constructor(
         private http: HttpClient
     ) { }
-    public getAllPosts(): Observable<PostResponse> {
-        return this.http.get<PostResponse>(this.getUrl);
+    public getAllPosts(): Observable<Post[]> {
+        return this.http.get<Post[]>(this.getUrl);
     }
     public createPost(request: any): Observable<any> {
         return this.http.post(this.createUrl, { headers: this.headers }, request);

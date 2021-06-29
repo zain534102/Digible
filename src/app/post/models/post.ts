@@ -5,8 +5,24 @@ export class Post {
     body?: string;
 }
 export class PostResponse {
-    data?: Post[];
+    data!: Post[] | null;
 }
 export class PosCreatedResponse {
     id?: number;
+}
+export class PostCreateRequest {
+    title?: string;
+    userId?: number;
+    body?: string;
+}
+export class PostEditRequest {
+    title?: string;
+    userId?: number;
+    body?: string;
+}
+export class PostEditResponse {
+    id?: number;
+    title?: string;
+    body?: string;
+    userId?: number;
 }

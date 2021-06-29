@@ -1,3 +1,4 @@
+import { EffectsModule } from '@ngrx/effects';
 import { SubjectService } from './post/services/subject.service';
 import { PostService } from './post/services/post.service';
 import { PostModule } from './post/post.module';
@@ -9,6 +10,10 @@ import { AppComponent } from './app.component';
 import {LayoutModule} from './layout/layout.module';
 import { HttpClientModule } from '@angular/common/http';
 import { NgForm, FormsModule } from '@angular/forms';
+import { environment } from 'src/environments/environment';
+/*Ngrx*/
+import { StoreModule } from '@ngrx/store';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 @NgModule({
   declarations: [
     AppComponent
@@ -19,6 +24,13 @@ import { NgForm, FormsModule } from '@angular/forms';
     LayoutModule,
     PostModule,
     HttpClientModule,
+    StoreModule.forRoot({}),
+    EffectsModule.forRoot([]),
+    StoreDevtoolsModule.instrument({
+      name: 'Finlax Test Task',
+      maxAge: 25,
+      logOnly: environment.production,
+    }),
   ],
   providers: [PostService],
   bootstrap: [AppComponent, SubjectService]
